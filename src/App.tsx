@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { convertColorToHex, type ColorResponse } from './services/anthropicService'
+import { useState } from 'react'
+import { convertColorToHex, } from './services/anthropicService'
 import FlyingGeese from './components/FlyingGeese'
 import './App.css'
 
@@ -10,11 +10,6 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const [invalidColorMessage, setInvalidColorMessage] = useState<string | null>(null)
 
-  // For debugging
-  useEffect(() => {
-    console.log("Invalid color message state:", invalidColorMessage);
-  }, [invalidColorMessage]);
-
   const handleColorSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!color.trim()) return
@@ -24,17 +19,13 @@ function App() {
     setInvalidColorMessage(null)
     
     try {
-      console.log("Submitting color:", color);
       const response = await convertColorToHex(color)
-      console.log("API response:", response);
       
       if (response.isValid) {
-        console.log("Valid color:", response.hexColor);
         setBackgroundColor(response.hexColor)
         setInvalidColorMessage(null)
       } else {
         // If the color is invalid, show the silly goose message
-        console.log("Invalid color, showing geese");
         setInvalidColorMessage(response.message)
       }
     } catch (err) {
@@ -43,12 +34,6 @@ function App() {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  // For testing - comment out for production
-  const showTestGeese = () => {
-    console.log("Showing test geese");
-    setInvalidColorMessage("thats not a color, you silly goose");
   }
 
   return (
@@ -81,13 +66,6 @@ function App() {
               <p>Hex value: <strong>{backgroundColor}</strong></p>
             </div>
           )}
-          
-          {/* Temporary test button - remove in production */}
-          <button 
-            onClick={showTestGeese} 
-            style={{ marginTop: '20px', backgroundColor: '#e74c3c' }}>
-            Test Geese
-          </button>
         </div>
       </div>
     </div>
