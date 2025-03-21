@@ -1,0 +1,84 @@
+.flying-geese-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.goose {
+  position: absolute;
+  will-change: transform, left, top;
+  animation: fly 0.5s infinite alternate ease-in-out;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2.5em;
+  font-weight: bold;
+  color: white;
+  text-shadow: 
+    2px 2px 0 #000,
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000;
+  background-color: rgba(255, 165, 0, 0.7);
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  transition: transform 0.1s ease-in-out;
+  z-index: 10000;
+}
+
+.goose-variant-0 {
+  background-color: rgba(255, 165, 0, 0.9); /* Orange */
+}
+
+.goose-variant-1 {
+  background-color: rgba(100, 149, 237, 0.9); /* Cornflower Blue */
+}
+
+.goose-variant-2 {
+  background-color: rgba(152, 251, 152, 0.9); /* Pale Green */
+}
+
+.silly-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 25px 40px;
+  border-radius: 15px;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #e74c3c;
+  text-align: center;
+  z-index: 10001;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  animation: bounce 0.8s infinite alternate;
+  user-select: none;
+  border: 3px solid #e74c3c;
+}
+
+@keyframes fly {
+  0% {
+    transform: translateY(0px) scale(1) rotate(var(--rotation));
+  }
+  100% {
+    transform: translateY(15px) scale(1.1) rotate(var(--rotation));
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+} 
