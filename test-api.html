@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>API Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      min-height: 100px;
+    }
+    button {
+      padding: 8px 16px;
+      background: #4c56af;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    input {
+      padding: 8px;
+      width: 200px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Color API Test</h1>
+  
+  <div>
+    <input type="text" id="colorInput" placeholder="Enter a color name" value="blue">
+    <button onclick="testAPI()">Test API</button>
+  </div>
+  
+  <div class="result" id="result">
+    <p>Results will appear here...</p>
+  </div>
+  
+  <script>
+    function testAPI() {
+      const colorName = document.getElementById('colorInput').value;
+      const resultDiv = document.getElementById('result');
+      
+      resultDiv.innerHTML = '<p>Sending request...</p>';
+      
+      fetch('/api/convert-color', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ colorName }),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        resultDiv.innerHTML = `
+          <h3>Success!</h3>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+          ${data.isValid ? `<div style="width:100px;height:100px;background-color:${data.hexColor}"></div>` : ''}
+        `;
+      })
+      .catch(error => {
+        resultDiv.innerHTML = `
+          <h3>Error</h3>
+          <p>${error.message}</p>
+        `;
+      });
+    }
+  </script>
+</body>
+</html> 

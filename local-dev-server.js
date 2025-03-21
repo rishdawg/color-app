@@ -13,16 +13,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = 3000;
 
-// Check if API key is available
-if (!process.env.ANTHROPIC_API_KEY) {
-  console.error('⚠️ ANTHROPIC_API_KEY is not set in .env.local file');
-  console.error('Please create a .env.local file with your API key:');
-  console.error('ANTHROPIC_API_KEY=your_api_key_here');
-  process.exit(1);
+// Enable mock mode if no API key is available
+const MOCK_MODE = !process.env.ANTHROPIC_API_KEY;
+
+if (MOCK_MODE) {
+  console.warn('⚠️ ANTHROPIC_API_KEY is not set in .env.local file');
+  console.warn('Running in MOCK MODE - API responses will be simulated');
+} else {
+  console.log(`🔑 Using Anthropic API key: ${process.env.ANTHROPIC_API_KEY.substring(0, 5)}...`);
 }
 
-// Initialize Anthropic client
-const anthropic = new Anthropic({
+// Only initialize Anthropic client if not in mock mode
+const anthropic = MOCK_MODE ? null : new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
 });
 
@@ -40,6 +42,11 @@ async function createServer() {
   // Use vite's connect instance as middleware
   app.use(vite.middlewares);
 
+  // API test page
+  app.get('/test-api', (req, res) => {
+    res.sendFile('test-api.html', { root: __dirname });
+  });
+
   // API endpoint - implemented directly for local development
   app.post('/api/convert-color', async (req, res) => {
     try {
@@ -51,6 +58,38 @@ async function createServer() {
       
       console.log(`🎨 Processing color request: "${colorName}"`);
       
+      // Mock response for testing or when API key is not available
+      if (MOCK_MODE) {
+        console.log('🔄 Using mock response');
+        
+        // Return a fixed response based on common colors for testing
+        const mockResponses = {
+          'blue': '#0000FF',
+          'red': '#FF0000',
+          'green': '#00FF00',
+          'yellow': '#FFFF00',
+          'purple': '#800080',
+          'orange': '#FFA500',
+          'black': '#000000',
+          'white': '#FFFFFF'
+        };
+        
+        const lowerColor = colorName.toLowerCase();
+        const hexColor = mockResponses[lowerColor] || 'thats not a color, you silly goose';
+        
+        if (hexColor.startsWith('#')) {
+          console.log(`✅ Mock valid color: ${hexColor}`);
+          return res.json({ hexColor, isValid: true });
+        } else {
+          console.log(`❌ Mock invalid color`);
+          return res.json({ 
+            isValid: false, 
+            message: hexColor 
+          });
+        }
+      }
+      
+      // Real API call
       const message = await anthropic.messages.create({
         model: 'claude-3-7-sonnet-latest',
         max_tokens: 150,
@@ -92,7 +131,7 @@ async function createServer() {
   app.listen(PORT, () => {
     console.log(`🚀 Local development server running at http://localhost:${PORT}`);
     console.log(`📝 API available at http://localhost:${PORT}/api/convert-color`);
-    console.log(`🔑 Using Anthropic API key: ${process.env.ANTHROPIC_API_KEY.substring(0, 5)}...`);
+    console.log(`🔧 Running in ${MOCK_MODE ? 'MOCK MODE (no API calls)' : 'LIVE MODE (real API calls)'}`);
   });
 }
 
